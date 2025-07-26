@@ -1,0 +1,1 @@
+{{-- Footer content will go here --}}
