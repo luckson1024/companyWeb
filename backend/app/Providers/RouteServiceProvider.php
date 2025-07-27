@@ -20,6 +20,23 @@ class RouteServiceProvider extends ServiceProvider
     public const HOME = '/home';
 
     /**
+     * Get the full URL for a path
+     *
+     * @param string $path
+     * @return string
+     */
+    public static function getFullUrl($path)
+    {
+        $baseUrl = config('app.url');
+        if (empty($baseUrl)) {
+            $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+            $host = $_SERVER['HTTP_HOST'];
+            $baseUrl = "{$protocol}://{$host}";
+        }
+        return rtrim($baseUrl, '/') . '/' . ltrim($path, '/');
+    }
+
+    /**
      * Define your route model bindings, pattern filters, and other route configuration.
      */
     public function boot(): void

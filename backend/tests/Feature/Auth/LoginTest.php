@@ -27,6 +27,7 @@ class LoginTest extends TestCase
                 ->assertJsonStructure([
                     'message',
                     'token',
+                    'redirect',
                     'user' => [
                         'id',
                         'name',
@@ -52,7 +53,10 @@ class LoginTest extends TestCase
 
         $response->assertStatus(401)
                 ->assertJson([
-                    'message' => 'Invalid credentials'
+                    'message' => 'The provided credentials are incorrect.',
+                    'errors' => [
+                        'email' => ['The provided credentials are incorrect.']
+                    ]
                 ]);
     }
 
@@ -93,11 +97,80 @@ class LoginTest extends TestCase
                 ->assertJsonStructure([
                     'message',
                     'token',
-                    'user'
+                    'redirect',
+                    'user' => [
+                        'id',
+                        'name',
+                        'email',
+                        'created_at',
+                        'updated_at'
+                    ]
                 ]);
                 
-        // Token should be longer for remember me
+        // Token should be present
         $token = $response->json('token');
-        $this->assertTrue(strlen($token) > 0);
+        $this->assertTrue(strlen($token) > 0, 'Token should be generated');
+    }
+
+    public function test_login_attempts_are_throttled(): void
+    {
+        $user = User::create([
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'password' => bcrypt('password123')
+        ]);
+
+        // Attempt to login 6 times with wrong password
+        for ($i = 0; $i < 6; $i++) {
+            $response = $this->postJson('/api/login', [
+                'email' => 'test@example.com',
+                'password' => 'wrongpassword'
+            ]);
+        }
+
+        // The 6th attempt should be throttled
+        $response->assertStatus(429)
+                ->assertJson([
+                    'message' => 'Too many login attempts. Please try again later.'
+                ]);
+    }
+
+    public function test_login_attempt_counter_resets_after_successful_login(): void
+    {
+        $user = User::create([
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'password' => bcrypt('password123')
+        ]);
+
+        // Make 4 failed attempts
+        for ($i = 0; $i < 4; $i++) {
+            $this->postJson('/api/login', [
+                'email' => 'test@example.com',
+                'password' => 'wrongpassword'
+            ]);
+        }
+
+        // Login successfully
+        $response = $this->postJson('/api/login', [
+            'email' => 'test@example.com',
+            'password' => 'password123'
+        ]);
+
+        $response->assertStatus(200);
+
+        // Should be able to attempt again
+        $response = $this->postJson('/api/login', [
+            'email' => 'test@example.com',
+            'password' => 'wrongpassword'
+        ]);
+
+        $response->assertStatus(401)
+                ->assertJson([
+                    'message' => 'The provided credentials are incorrect.',
+                    'errors' => [
+                        'email' => ['The provided credentials are incorrect.']
+                    ]
+                ]);
     }
 }
