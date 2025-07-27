@@ -1,3 +1,7 @@
+---
+mode: agent
+description: A comprehensive to-do list for the Laravel project, tracking tasks and progress.
+---
 # To-Do List
 
 ### Reminder: No scaffolding or Placeholder
@@ -40,15 +44,11 @@ Vital Note: system following TDD principles
   - [x] Implement registration tests
   - [x] Add email uniqueness validation
   - [x] Add password confirmation validation
-  - [x] Implement frontend validation with Stimulus.js
-  - [x] Add real-time form validation
-  - [x] Add password strength validation
 - [x] Implement User Login with TDD
   - [x] Create login endpoint with validation
   - [x] Implement login tests
   - [x] Add token-based authentication
   - [x] Add remember me functionality
-  - [x] Add frontend validation with Stimulus.js
 - [x] Create forgot password and reset password functionality
   - [x] Implement forgot password endpoint
   - [x] Implement reset password endpoint
@@ -62,10 +62,7 @@ Vital Note: system following TDD principles
   - [ ] Implement ThrottleLogins middleware
   - [ ] Set rate limits (5 attempts per minute)
   - [ ] Add lockout messages
-- [x] Configure login redirect paths
-  - [x] Add proper route handling
-  - [x] Implement authentication flow
-  - [x] Add home page redirect
+- [ ] Configure login redirect paths
 - [ ] Add logout confirmation
   - [ ] Create modal confirmation dialog
   - [ ] Add transition animations
